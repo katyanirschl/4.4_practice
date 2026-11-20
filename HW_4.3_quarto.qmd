@@ -1,0 +1,806 @@
+---
+title: "Reproducible Data Analysis"
+author: "Katya Nirschl"
+format:
+  pdf:
+    number-sections: true
+editor: visual
+date: "Nov. 15, 2026"
+execute: 
+  echo: false
+  message: false
+  warning: false
+---
+
+```{r}
+#| label: setup
+
+library(tidyverse)
+```
+
+# Diamonds Table of Statistics
+
+## Length Statistics
+```{r}
+#| label: tbl-length
+#| fig-cap: "Descriptive Statistics of Diamond Length (x, in mm) by Clarity"
+#| fig-pos: "H"
+
+# Diamonds Descriptive Statistics Table By Length ----
+
+# 1. Load the packages ----
+library(tidyverse)
+library(janitor)
+library(knitr)
+library(kableExtra)
+
+# 2. Clean the data ----
+# Remove diamonds with a length of 0, and keep only what we need (clarity and x)
+cleanDiamonds <- diamonds |>
+  filter_out(x == 0) |>
+  select(clarity, x)
+
+# 3. Compute the statistics ----
+clarityStats <- cleanDiamonds |>
+  group_by(clarity) |>
+  summarise(
+    count  = n(),
+    min    = min(x),
+    q20    = quantile(x, probs = 0.2, names = FALSE),
+    q40    = quantile(x, probs = 0.4, names = FALSE),
+    median = median(x),
+    q60    = quantile(x, probs = 0.6, names = FALSE),
+    q80    = quantile(x, probs = 0.8, names = FALSE),
+    max    = max(x),
+    mean   = mean(x),
+    sd     = sd(x),
+    .groups = "drop"
+  )
+
+# 4. Polish the data frame ----
+clarityStats <- clarityStats |>
+  # round the statistics to 2 decimals
+  adorn_rounding(digits = 2)   
+
+# 5. Format the table ----
+clarityStats |>
+  kable(
+    caption   = "Descriptive Statistics of Diamond Length (x, in mm) by Clarity",
+    col.names = c("Clarity", "Count", "Min.", "20%", "40%",
+                  "Median", "60%", "80%", "Max.", "Mean",
+                  "Std. Dev."),
+    align     = c("l", rep("r", 10)),
+    digits    = c(0, 0, rep(2, 9)),           
+    # count whole, the rest 2 decimals
+    format.args = list(big.mark = ",")
+  ) |>
+  kable_styling(
+    latex_options = "hold_position",
+    position = "center"
+  ) |>
+  add_header_above(c(" " = 1, "Length (x) Statistics, in mm" = 10))
+
+```
+@tbl-length The data shows a clear trend of diamond length decreasing as clarity improves. The lowest-clarity diamonds, such as I1 and SI2, have the largest median lengths at 6.65 mm and 6.42 mm, respectively. As clarity increases, the median length generally decreases, reaching 4.57 mm for the highest-clarity group, IF. The mean length follows the same overall pattern, dropping from 6.76 mm for I1 to 4.97 mm for IF. Overall, diamonds with higher clarity tend to have smaller lengths, while lower-clarity diamonds tend to be larger.
+
+## Width Statistics
+```{r}
+#| label: tbl-width
+#| fig-cap: "Descriptive Statistics of Diamond Width (y, in mm) by Clarity"
+#| fig-pos: "H"
+
+# Diamonds Descriptive Statistics Table By Width ----
+
+# 1. Load the packages ----
+library(tidyverse)
+library(janitor)
+library(knitr)
+library(kableExtra)
+
+# 2. Clean the data ----
+# Remove diamonds with a width of 0, and keep only what we need (clarity and y)
+cleanDiamondsY <- diamonds |>
+  filter_out(y == 0) |>
+  select(clarity, y)
+
+# 3. Compute the statistics ----
+clarityStatsY <- cleanDiamondsY |>
+  group_by(clarity) |>
+  summarise(
+    count  = n(),
+    min    = min(y),
+    q20    = quantile(y, probs = 0.2, names = FALSE),
+    q40    = quantile(y, probs = 0.4, names = FALSE),
+    median = median(y),
+    q60    = quantile(y, probs = 0.6, names = FALSE),
+    q80    = quantile(y, probs = 0.8, names = FALSE),
+    max    = max(y),
+    mean   = mean(y),
+    sd     = sd(y),
+    .groups = "drop"
+  )
+
+# 4. Polish the data frame ----
+clarityStatsY <- clarityStatsY |>
+  # round the statistics to 2 decimals
+  adorn_rounding(digits = 2)   
+
+# 5. Format the table ----
+clarityStatsY |>
+  kable(
+    caption   = "Descriptive Statistics of Diamond Width (y, in mm) by Clarity",
+    col.names = c("Clarity", "Count", "Min.", "20%", "40%",
+                  "Median", "60%", "80%", "Max.", "Mean",
+                  "Std. Dev."),
+    align     = c("l", rep("r", 10)),
+    digits    = c(0, 0, rep(2, 9)),           
+    # count whole, the rest 2 decimals
+    format.args = list(big.mark = ",")
+  ) |>
+  kable_styling(
+     latex_options = "hold_position",
+     position = "center"
+  ) |>
+  add_header_above(c(" " = 1, "Width (y) Statistics, in mm" = 10))
+
+```
+@tbl-width The data shows a general trend of diamond width decreasing as clarity improves. The lowest-clarity diamonds, such as I1 and SI2, have the largest median widths at 6.61 mm and 6.41 mm, respectively. As clarity increases, the median width steadily drops, reaching 4.59 mm for the highest-clarity group, IF. The mean width follows a very similar pattern, decreasing from 6.71 mm for I1 to 4.99 mm for IF. Overall, the data suggests that diamonds with higher clarity tend to be smaller in width, although there is still some variation within each clarity group.
+
+{{< pagebreak >}}
+
+## Height Statistics
+```{r}
+#| label: tbl-height
+#| fig-cap: "Descriptive Statistics of Diamond Height (z, in mm) by Clarity"
+#| fig-pos: "H"
+
+# Diamonds Descriptive Statistics Table By Height ----
+
+# 1. Load the packages ----
+library(tidyverse)
+library(janitor)
+library(knitr)
+library(kableExtra)
+
+# 2. Clean the data ----
+# Remove diamonds with a width of 0, and keep only what we need (clarity and z)
+cleanDiamondsZ <- diamonds |>
+  filter_out(z == 0) |>
+  select(clarity, z)
+
+# 3. Compute the statistics ----
+clarityStatsZ <- cleanDiamondsZ |>
+  group_by(clarity) |>
+  summarise(
+    count  = n(),
+    min    = min(z),
+    q20    = quantile(z, probs = 0.2, names = FALSE),
+    q40    = quantile(z, probs = 0.4, names = FALSE),
+    median = median(z),
+    q60    = quantile(z, probs = 0.6, names = FALSE),
+    q80    = quantile(z, probs = 0.8, names = FALSE),
+    max    = max(z),
+    mean   = mean(z),
+    sd     = sd(z),
+    .groups = "drop"
+  )
+
+# 4. Polish the data frame ----
+clarityStatsZ <- clarityStatsZ |>
+  # round the statistics to 2 decimals
+  adorn_rounding(digits = 2)   
+
+# 5. Format the table ----
+clarityStatsZ |>
+  kable(
+    caption   = "Descriptive Statistics of Diamond Height (z, in mm) by Clarity",
+    col.names = c("Clarity", "Count", "Min.", "20%", "40%",
+                  "Median", "60%", "80%", "Max.", "Mean",
+                  "Std. Dev."),
+    align     = c("l", rep("r", 10)),
+    digits    = c(0, 0, rep(2, 9)),           
+    # count whole, the rest 2 decimals
+    format.args = list(big.mark = ",")
+  ) |>
+  kable_styling(
+    latex_options = "hold_position",
+    position = "center"
+  ) |>
+  add_header_above(c(" " = 1, "Height (z) Statistics, in mm" = 10))
+
+```
+@tbl-height The data shows a clear decrease in diamond height as clarity improves. The lowest-clarity diamonds, I1 and SI2, have the largest median heights at 4.11 mm and 3.97 mm, respectively. As clarity increases, the median height generally falls, reaching 2.80 mm for the highest-clarity group, IF. The mean height follows the same overall pattern, decreasing from 4.23 mm for I1 to 3.06 mm for both VVS1 and IF. Overall, diamonds with higher clarity tend to have smaller heights, while lower-clarity diamonds tend to be taller.
+
+# Big 10 Academic Alliance: Love Data Week
+
+```{r}
+#| label: btaa-data
+#| include: false
+
+# NCAA Women's Basketball 3-Point Attempts Over Time Line Plot ----
+# Tidy the ESPN Team Box Data ----
+## Coder: Katya Nirschl
+## Load and check the team box data, clean the team box data. 
+# Keep only the season and 3-point attempts columns and check for missing values. 
+# Summarize by season. Group the data by season and calculate the average 3-point 
+# attempts for each one because my line plot needs one value per season.
+
+# Step 1: Load Packages ----
+## Needed Packages: {tidyverse}
+library(tidyverse)
+
+# Step 2: Load Data ----
+## Needed data: team_box.csv (in the project folder)
+teamBoxRaw <- read.table(
+  file = "team_box.csv",
+  header = TRUE,
+  sep = ",",
+  ## only double quotes mark text
+  quote = "\""
+)  
+
+# Step 3: Wrangling the Data ----
+teamBoxTidy <- teamBoxRaw |>
+  select("season", "three_point_field_goals_attempted") |> 
+  filter(!is.na(three_point_field_goals_attempted))
+
+# Step 4: make summary table
+teamBoxSummary <- teamBoxTidy |>
+  group_by(season) |>
+  summarize(avg_three_point_attempts = mean(three_point_field_goals_attempted))
+
+```
+
+```{r}
+#| label: fig-three-point-attempts
+#| fig-cap: "Average NCAA Women's Basketball 3-Point Attempts per Team per Game by Season"
+#| fig-pos: "H"
+#| fig-width: 6
+#| fig-height: 4
+#| fig-alt: "Line chart showing average NCAA three-point attempts per team per game increasing overall from 14.67 in 2006 to 20.03 in 2026, with several fluctuations and a sharp rise after 2013."
+
+teamBoxSummary |>
+  ggplot(
+    aes(
+      x = season,
+      y = avg_three_point_attempts
+    )
+  ) +
+  geom_line() +
+  geom_point() +
+  theme_bw() +
+  labs(
+    x = "Season",
+    y = "Average 3-Point Attempts",
+    title = "Average NCAA 3-Point Attempts Over Time"
+  ) +
+  theme(
+    text = element_text(family = "serif", size = 14),
+    plot.title = element_text(hjust = 0.5)
+  )
+```
+@fig-three-point-attempts This visualization shows that three-point attempts per team per game have generally increased in NCAA basketball from 2006 to 2026. While there are some ups and downs between seasons (specifically between 2009 and 2014), the overall trend goes upward, especially after 2013. In 2006, teams averaged about 14.67 attempts per game, compared to 20.03 in 2026. This suggests that teams have started relying more on three-point shots as part of their offensive strategies. One possible explanation is that individual players have become better at shooting from longer distances, making three-point shots a more valuable strategy despite the risk of missing. For the Big Ten Academic Alliance, this data could be useful in exploring how basketball strategies have changed over time and how statistics influence decisions made by coaches and teams.
+
+# Monte Carlo Numerical Integration
+
+```{r}
+#| label: fig-monte-carlo
+#| fig-cap: "Monte Carlo estimates of the area under a chi-square density curve using increasing numbers of randomly generated points."
+#| fig-subcap:
+#|   - "10 randomly generated points"
+#|   - "100 randomly generated points"
+#|   - "1,000 randomly generated points"
+#|   - "10,000 randomly generated points"
+#| fig-alt:
+#|   - "Scatterplot showing 10 randomly generated points within the simulation region and their locations relative to the chi-square density curve."
+#|   - "Scatterplot showing 100 randomly generated points within the simulation region and their locations relative to the chi-square density curve."
+#|   - "Scatterplot showing 1,000 randomly generated points within the simulation region and their locations relative to the chi-square density curve."
+#|   - "Scatterplot showing 10,000 randomly generated points within the simulation region and their locations relative to the chi-square density curve."
+#| layout-ncol: 2
+#| fig-pos: "H"
+
+# Create Monte Carlo Simulation Coordinate Generator
+coordinateGenerator <- function(n, x_min, x_max, y_min, y_max) {
+  output <- tibble(
+    x = runif(n, min = x_min, max = x_max),
+    y = runif(n, min = y_min, max = y_max)
+  )
+  
+  return(output)
+}
+
+# Generate and wrangle 10 points
+mc10 <- coordinateGenerator(
+  n = 10,
+  x_min = 0,
+  x_max = 20,
+  y_min = 0,
+  y_max = 0.16
+)
+
+mc10_tidy <- mc10 |>
+  mutate(
+    function_y = dchisq(x, df = 5),
+    under_curve = y <= function_y
+  )
+
+area10 <- (20 * 0.16) * mean(mc10_tidy$under_curve)
+
+plot10 <- ggplot(mc10_tidy, aes(x = x, y = y, color = under_curve)) +
+  geom_point(alpha = 0.5, size = 1) +
+  stat_function(
+    fun = dchisq,
+    args = list(df = 5),
+    xlim = c(0, 20),
+    color = "black",
+    linewidth = 1
+  ) +
+  scale_color_manual(
+    values = c("FALSE" = "red", "TRUE" = "blue"),
+    labels = c("FALSE" = "above", "TRUE" = "on/below")
+  ) +
+  labs(
+    title = "10 Points",
+    subtitle = paste("Estimated area =", round(area10, 5)),
+    x = "x",
+    y = "y",
+    color = "Point location"
+  ) +
+  coord_cartesian(xlim = c(0, 20), ylim = c(0, 0.16)) +
+  theme_bw() +
+  theme(
+    legend.position = "bottom",
+    text = element_text(family = "serif")
+  )
+
+
+# Generate and wrangle 100 points
+mc100 <- coordinateGenerator(
+  n = 100,
+  x_min = 0,
+  x_max = 20,
+  y_min = 0,
+  y_max = 0.16
+)
+
+mc100_tidy <- mc100 |>
+  mutate(
+    function_y = dchisq(x, df = 5),
+    under_curve = y <= function_y
+  )
+
+area100 <- (20 * 0.16) * mean(mc100_tidy$under_curve)
+
+plot100 <- ggplot(mc100_tidy, aes(x = x, y = y, color = under_curve)) +
+  geom_point(alpha = 0.5, size = 1) +
+  stat_function(
+    fun = dchisq,
+    args = list(df = 5),
+    xlim = c(0, 20),
+    color = "black",
+    linewidth = 1
+  ) +
+  scale_color_manual(
+    values = c("FALSE" = "red", "TRUE" = "blue"),
+    labels = c("FALSE" = "above", "TRUE" = "on/below")
+  ) +
+  labs(
+    title = "100 Points",
+    subtitle = paste("Estimated area =", round(area100, 5)),
+    x = "x",
+    y = "y",
+    color = "Point location"
+  ) +
+  coord_cartesian(xlim = c(0, 20), ylim = c(0, 0.16)) +
+  theme_bw() +
+  theme(
+    legend.position = "bottom",
+    text = element_text(family = "serif")
+  )
+
+
+# Generate and wrangle 1,000 points
+mc1000 <- coordinateGenerator(
+  n = 1000,
+  x_min = 0,
+  x_max = 20,
+  y_min = 0,
+  y_max = 0.16
+)
+
+mc1000_tidy <- mc1000 |>
+  mutate(
+    function_y = dchisq(x, df = 5),
+    under_curve = y <= function_y
+  )
+
+area1000 <- (20 * 0.16) * mean(mc1000_tidy$under_curve)
+
+plot1000 <- ggplot(mc1000_tidy, aes(x = x, y = y, color = under_curve)) +
+  geom_point(alpha = 0.5, size = 1) +
+  stat_function(
+    fun = dchisq,
+    args = list(df = 5),
+    xlim = c(0, 20),
+    color = "black",
+    linewidth = 1
+  ) +
+  scale_color_manual(
+    values = c("FALSE" = "red", "TRUE" = "blue"),
+    labels = c("FALSE" = "above", "TRUE" = "on/below")
+  ) +
+  labs(
+    title = "1,000 Points",
+    subtitle = paste("Estimated area =", round(area1000, 5)),
+    x = "x",
+    y = "y",
+    color = "Point location"
+  ) +
+  coord_cartesian(xlim = c(0, 20), ylim = c(0, 0.16)) +
+  theme_bw() +
+  theme(
+    legend.position = "bottom",
+    text = element_text(family = "serif")
+  )
+
+
+# Generate and wrangle 10,000 points
+mc10000 <- coordinateGenerator(
+  n = 10000,
+  x_min = 0,
+  x_max = 20,
+  y_min = 0,
+  y_max = 0.16
+)
+
+mc10000_tidy <- mc10000 |>
+  mutate(
+    function_y = dchisq(x, df = 5),
+    under_curve = y <= function_y
+  )
+
+area10000 <- (20 * 0.16) * mean(mc10000_tidy$under_curve)
+
+plot10000 <- ggplot(mc10000_tidy, aes(x = x, y = y, color = under_curve)) +
+  geom_point(alpha = 0.5, size = 1) +
+  stat_function(
+    fun = dchisq,
+    args = list(df = 5),
+    xlim = c(0, 20),
+    color = "black",
+    linewidth = 1
+  ) +
+  scale_color_manual(
+    values = c("FALSE" = "red", "TRUE" = "blue"),
+    labels = c("FALSE" = "above", "TRUE" = "on/below")
+  ) +
+  labs(
+    title = "10,000 Points",
+    subtitle = paste("Estimated area =", round(area10000, 5)),
+    x = "x",
+    y = "y",
+    color = "Point location"
+  ) +
+  coord_cartesian(xlim = c(0, 20), ylim = c(0, 0.16)) +
+  theme_bw() +
+  theme(
+    legend.position = "bottom",
+    text = element_text(family = "serif")
+  )
+
+
+# Display the four sub-figures
+plot10
+plot100
+plot1000
+plot10000
+```
+
+@fig-monte-carlo-1 The first panel shows the results from generating 10 random points. With such a small sample, the points are relatively sparse, so the estimated area of 1.6 is not very close to the expected value of approximately 1. This shows how random variation can have a large effect when the sample size is small.
+
+@fig-monte-carlo-2 The second panel uses 100 random points. The points cover the simulation region more evenly than in the first pane, and the estimated area is closer to the expected value, with an estimated area of 1.12. This demonstrates that increasing the number of simulated points can improve the accuracy of the Monte Carlo estimate.
+
+@fig-monte-carlo-3 The third panel shows 1,000 random points. The larger sample provides much more coverage of the region, and the estimated area is more stable and closer to the expected value, with an estimated area of 0.992. This supports the idea that Monte Carlo estimates become more reliable as the number of random points increases.
+
+@fig-monte-carlo-4 The fourth panel shows 10,000 random points. The points provide the most complete coverage of the region, and the estimated area is now 1.00416, which is very close to the expected value of approximately 1. This pane provides the strongest visual evidence that increasing the sample size makes the Monte Carlo estimate converge toward the value of the integral.
+
+# Planning and Prompting GenAI Tools
+
+## Calcium Plan
+
+**Overall Goal:**
+
+Tidy the calcium data so that each case is one of the 31 women, with her treatment group and her four ulnar calcium measurements.
+
+SG1: Install and load any needed packages
+SG2: Get the calcium data into R and check it
+SG3: Tidy the calcium data
+SG4: Create plot that shows context of calcium data
+
+**Needs:**
+
+Nouns: the {tidyverse} meta-package, wrangling_template.R, calcium.csv, calcium data, scatterplot
+
+Verbs: install, load packages, read, check, select, rename, filter out, mutate, bind, relocate, count, map, draw, add, label, theme
+
+Functions and Operators: install.packages, library, <-, read_csv, View, str, |>, select, set_names, filter_out, is.na, mutate, bind_rows, row_number, relocate, nrow, count, ggplot, aes, geom_point, geom_abline, labs, theme_bw, +
+
+**Steps**
+
+1. Download calcium.csv and save it in the folder R is working from.
+2. Make sure {tidyverse} package
+3. Load packages
+4. Read the data.
+5. Save the result as calciumRaw.
+5. Check the data for tidiness issues.
+    a. The null treatment group has 15 women, so row 16 in the first four columns is NA.
+    b. The column names repeat across the two groups (y0 to y3, then y0.1 to y3.1), so the names              can’t tell us which group a woman is in.
+    c. There is no group column and no woman column, so the group is only shown by which block of             columns the data sits in.
+6. Tidy and wrangle the data.
+    a. For the null treatment group:
+      i. Select the first four columns by position.
+      ii. Reset the names to initial, year1, year2 and year3.
+      iii. Filter out the row where the measurements are NA (the 16th row).
+      iv. Make a new column called group and fill it with “Null Treatment.”
+    b. For the diet/exercise group
+      i. Select columns 5 through 8 by position.
+      ii. Reset the names to initial, year1, year2 and year3, the same names as above.
+      iii. Make a new column called group and fill it with “Diet/Exercise.”
+    c. Combine the groups
+      i. Bind the null treatment rows and the diet/exercise rows together into one data frame, saved as         calciumTidy.
+      ii. Make a new column called woman that numbers the rows from 1 to 31.
+      iii. Move woman to the first column.
+7. Create the plot.
+      a. Set up the plot with calciumTidy as the data.
+      b. Map initial to the x-axis, year3 to the y-axis, and group to color.
+      c. Draw one point for each woman.
+      d. Add a dashed reference line with a slope of 1 and an intercept of 0. A woman on this line had          the same calcium at year 3 as at the start.
+      d. Label the axes, the legend and the title.
+      e. Apply a black and white theme.
+8. Coding
+    1. Copy the wrangling_template.R into a new script and begin filling in pieces
+    2. Install {tidyverse}, if needed
+    3. Load {tidyverse} using library
+    4. Use read_csv to read calcium.csv
+    5. Save the result as calciumRaw using <-
+    6. Check the import using the View and str commands
+    7. Tidy the null treatment group
+    8. Start from calciumRaw and pass it forward with |>
+    9. select the first four columns by position
+    10. Reset the names to initial, year1, year2 and year3 using set_names
+    11. Use filter_out with is.na to drop the row where the measurements are NA
+    12. Use mutate to add a group column that says “Null Treatment”
+    13. Save the result as calciumNull
+    14. Tidy the diet/exercise group
+    15. Start from calciumRaw and pass it forward with |>
+    16. select columns 5 through 8 by position
+    17. Reset the names to initial, year1, year2 and year3 using set_names
+    18. Use mutate to add a group column that says “Diet/Exercise”
+    19. Save the result as calciumDiet
+    20. Combine the two groups
+    21. Use bind_rows to stack calciumNull and calciumDiet
+    22. Use mutate with row_number to add a woman column that numbers the rows from 1 to 31
+    23. Use relocate to move woman to the first column
+    24. Save the result as calciumTidy
+    25. Start with ggplot and data = calciumTidy
+    26. Use aes to map x = initial, y = year3 and color = group
+    27. Add + geom_point
+    28. Add + geom_abline with slope = 1, intercept = 0 and linetype = "dashed"
+    29. Add + labs for the title, the axis labels and the legend title
+    30. Add + theme_bw
+
+## Plan-informed Results from ChatGPT
+```{r}
+#| label: fig-calcium
+#| fig-cap: "Initial versus year 3 ulnar calcium measurements by treatment group."
+#| fg-alt: "Scatter plot of year 3 versus initial ulnar calcium for Diet/Exercise and Null Treatment groups, with an upward-sloping dashed reference line."
+#| fig-pos: "H"
+#| out-width: "65%"
+#| fig-align: "center"
+
+# SG1: Install and load packages
+library(tidyverse)
+
+# SG2: Get the calcium data into R and check it
+calciumRaw <- read_csv("/Users/katyanirschl/Downloads/calcium.csv")
+
+# SG3: Tidy the calcium data
+
+# Null treatment group
+calciumNull <- calciumRaw |>
+  select(1:4) |>
+  set_names(c("initial", "year1", "year2", "year3")) |>
+  filter(!is.na(initial)) |>
+  mutate(group = "Null Treatment")
+
+
+# Diet/Exercise group
+calciumDiet <- calciumRaw |>
+  select(5:8) |>
+  set_names(c("initial", "year1", "year2", "year3")) |>
+  mutate(group = "Diet/Exercise")
+
+
+# Combine the two groups
+calciumTidy <- bind_rows(calciumNull, calciumDiet) |>
+  mutate(woman = row_number()) |>
+  relocate(woman)
+
+# SG4: Create plot that shows context of calcium data
+
+ggplot(data = calciumTidy,
+       aes(x = initial, y = year3, color = group)) +
+  geom_point() +
+  geom_abline(
+    slope = 1,
+    intercept = 0,
+    linetype = "dashed"
+  ) +
+  labs(
+    title = "Ulnar Calcium at Year 3 vs. Initial Calcium",
+    x = "Initial Ulnar Calcium",
+    y = "Year 3 Ulnar Calcium",
+    color = "Treatment Group"
+  ) +
+  theme_bw()
+```
+
+## Generic AI Prompt
+
+Prompt: Create a data visualization for these data. Calcium.csv
+
+## Result of Generic AI Prompt
+
+```{r}
+#| label: fig-calcium-generic
+#| fig-cap: "Initial versus year 3 ulnar calcium measurements by treatment group."
+#| fig-alt: "Line chart of average values across eight columns, with peaks near 73 at y1 and y2.1 and sharp lows near 65 at y3 and y3.1."
+#| fig-pos: "H"
+#| fig-align: "center"
+
+knitr::include_graphics("/Users/katyanirschl/Downloads/chatgptPlot.png")
+```
+
+## Comparing and contrasting the two sets of results
+
+The generic AI prompt result shows average calcium values, but it loses information about individual women and their treatment groups. While the axes are labeled, they are very vague, and the units along the X axis are unclear, especially without a key. The plan-informed result shows each woman separately and uses color to compare the two groups. The dashed line also makes changes from the initial to year 3 easy to see. Both axes are numeric, clearly labeled, and there is a color key. Overall, the plan-informed visualization is better because it gives a clearer picture of the individual data and the differences between the treatment groups.
+
+# Reflection
+
+Before this course, I did not know how to code at all. So, as you can imagine, learning R from the beginning has been a big learning experience for me. One of the first things I learned was how to create my own functions. I had to learn not only the actual code, but also what template to use, how to name a function, and how to properly document it. The Restaurant Sampler project was the first time I created a function on my own, and it made me realize that writing a function involves more than just getting the code to run. I then learned how to wrangle data, which I first saw with the Hypoxia data in class. Before this course, I did not even know what a case represented, let alone what tidy data was. Learning these concepts was confusing at first, but once I understood why I was doing each step, the rest of the course started to feel much more manageable.
+
+After I became more comfortable with functions and data wrangling, I started to enjoy working with visualizations the most. I liked being able to take the code and data I had worked with and turn it into something that could actually be understood by someone looking at it. Assignment 3.4 took me a very long time, but seeing the final result presented as a graph made the work feel worth it. Looking back, I think the biggest change for me is that I now understand the reasoning behind many of the steps I am taking in R instead of just trying different things until my code works. I went from not knowing how to code at all to being able to write functions, wrangle data, and create visualizations on my own, which is a massive improvement in my eyes. 
+
+{{< pagebreak >}}
+
+# Appendix A: GenAI Usage
+
+## I used the ASU Image Accessibility AI Tool on 11/02/26, which uses OpenAI's GPT-4o model. I provided a JPEG version of figure one from section 2.
+Alt Text: 
+
+Line chart showing average NCAA three-point attempts per team per game increasing overall from 14.67 in 2006 to 20.03 in 2026, with several fluctuations and a sharp rise after 2013.
+
+## I used the ASU Image Accessibility AI Tool on 11/17/26, which uses OpenAI's GPT-4o model. I provided a JPEG version of the 4 sub-plots, figures 2a, 2b, 2c, 2d, from section 3. 
+Alt Texts:
+2a. "Scatterplot showing 10 randomly generated points within the simulation region and their locations relative to the chi-square density curve."
+
+2b. "Scatterplot showing 100 randomly generated points within the simulation region and their locations relative to the chi-square density curve."
+
+2c. "Scatterplot showing 1,000 randomly generated points within the simulation region and their locations relative to the chi-square density curve."
+
+2d. "Scatterplot showing 10,000 randomly generated points within the simulation region and their locations relative to the chi-square density curve."
+
+## I used the ASU Image Accessibility AI Tool on 11/19/26, which uses OpenAI's GPT-4o model. I provided a JPEG version of figure 3 from section 4.2.  
+Alt Text:
+
+“Scatter plot of year 3 versus initial ulnar calcium for Diet/Exercise and Null Treatment groups, with an upward-sloping dashed reference line.”
+
+## I used ChatGPT, GPT-6 (OpenAI) on 11/19/26. I provided the prompt: “Using this calcium csv and my plan to create R code to tidy the calcium data and make the calcium visualization.”, and uploaded the calcium.csv file. In order to use the code in Quarto, I removed any use of View(), str(), or install.packages(), which did not change the purpose of the code. This was the exact response generated by the tool:
+
+`#` SG1
+
+install.packages("tidyverse")
+
+library(tidyverse)
+
+
+
+
+
+`#`SG2
+
+calciumRaw <- read_csv("calcium.csv")
+
+View(calciumRaw)
+
+str(calciumRaw)
+
+
+
+
+
+`#`SG3
+
+calciumNull <- calciumRaw |>
+
+  select(1:4) |>
+  
+  set_names(c("initial", "year1", "year2", "year3")) |>
+  
+  filter(!is.na(initial)) |>
+  
+  mutate(group = "Null Treatment")
+  
+  
+
+calciumDiet <- calciumRaw |>
+
+  select(5:8) |>
+  
+  set_names(c("initial", "year1", "year2", "year3")) |>
+  
+  mutate(group = "Diet/Exercise")
+  
+  
+
+calciumTidy <- bind_rows(calciumNull, calciumDiet) |>
+
+  mutate(woman = row_number()) |>
+  
+  relocate(woman)
+  
+  
+
+View(calciumTidy)
+
+str(calciumTidy)
+
+nrow(calciumTidy)
+
+count(calciumTidy, group)
+
+
+
+
+
+`#`SG4
+
+ggplot(data = calciumTidy,
+
+       aes(x = initial, y = year3, color = group)) +
+       
+  geom_point() +
+  
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed") +
+  
+  labs(
+  
+    title = "Ulnar Calcium at Year 3 vs. Initial Calcium",
+    
+    x = "Initial Ulnar Calcium",
+    
+    y = "Year 3 Ulnar Calcium",
+    
+    color = "Treatment Group"
+    
+  ) +
+  
+  theme_bw()
+  
+  
+
+## I used the ASU Image Accessibility AI Tool on 11/19/26, which uses OpenAI's GPT-4o model. I provided a JPEG version of figure 4 from section 4.4. 
+Alt Text:
+
+“Line chart of average values across eight columns, with peaks near 73 at y1 and y2.1 and sharp lows near 65 at y3 and y3.1.”
+
+{{< pagebreak >}}
+
+# Appendix B: Code Appendix
+
+```{r}
+#| label: codeAppend
+#| ref-label: !expr knitr::all_labels()
+#| echo: true
+#| eval: false
+```
