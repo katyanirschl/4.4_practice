@@ -17,6 +17,12 @@ GitHub version control, and keep the repository organized and up to date. The
 project is being developed on a development branch before the completed work is 
 merged into the main branch.
 
+GitHub Workflow
+
+The project was developed on the development branch and tracked using GitHub 
+Issues and commits. Completed work was reviewed through a pull request before 
+being merged into the main branch.
+
 The repository will be maintained using:
 - GitHub Issues to track project tasks.
 - Commits to document meaningful changes.
